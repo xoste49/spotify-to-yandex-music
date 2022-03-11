@@ -2,7 +2,7 @@
 Скрипт копирующий музыку из Spotify в Яндекс.Музыка
 """
 import os
-from pprint import pprint
+import time
 
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -35,34 +35,21 @@ def parse_spotify():
     return tracks
 
 
-type_to_name = {
-    'track': 'трек',
-    'artist': 'исполнитель',
-    'album': 'альбом',
-    'playlist': 'плейлист',
-    'video': 'видео',
-    'user': 'пользователь',
-    'podcast': 'подкаст',
-    'podcast_episode': 'эпизод подкаста',
-}
-
-count_transferred_tracks = 0
+not_add_tracks = []
 
 
-def send_search_request_and_print_result(client, track):
+def send_search_request_and_print_result(client, track, number, count_tracks):
     query = track['artist'] + ' - ' + track['name']
     search_result = client.search(query)
 
     text = [f'Результаты по запросу "{query}":', '']
 
-    if len(query) < 75:
-        query = "%75s" % query
+    if len(query) < 70:
+        query = "%70s" % query
 
     if search_result.best:
         type_ = search_result.best.type
         best = search_result.best.result
-
-        text.append(f'❗️Лучший результат: {type_to_name.get(type_)}')
 
         if type_ in ['track', 'podcast_episode']:
             artists = ''
@@ -72,26 +59,34 @@ def send_search_request_and_print_result(client, track):
             if track['name'] in best.title:
                 success = client.users_likes_tracks_add(best.id)
                 if success:
-                    print("✅ %s | %s" % (query, artists + best.title))
+                    return "✅ (%s/%s) %s | %s" % (
+                    number, count_tracks, query, artists + best.title)
                 else:
-                    print("❌ %s | Произошла ошибка" % query)
-            else:
-                print("❌ %s | Трек не найден" % query)
-        else:
-            print("❌ %s | Трек не найден" % query)
-    else:
-        print("❌ %s | Трек не найден" % query)
+                    not_add_tracks.append("❌ %s | Произошла ошибка" % query)
+                    return "❌ (%s/%s) %s | Произошла ошибка" % (
+                    number, count_tracks, query)
+    not_add_tracks.append("❌ %s | Трек не найден" % query)
+    return "❌ (%s/%s) %s | Трек не найден" % (number, count_tracks, query)
 
 
 if __name__ == '__main__':
+    time_start_program = time.monotonic()
     Client()
     spotify_tracks = parse_spotify()
     spotify_tracks.reverse()
 
     client = Client(os.environ['YANDEX_MUSIC_TOKEN']).init()
     count_likes_tracks_before = len(client.users_likes_tracks().tracks)
-    for track in spotify_tracks:
-        send_search_request_and_print_result(client, track)
+    count_spotify_tracks = len(spotify_tracks)
+    for number, track in enumerate(spotify_tracks):
+        print(send_search_request_and_print_result(client, track, number,
+                                             count_spotify_tracks))
     count_likes_tracks_after = len(client.users_likes_tracks().tracks)
     print('Количество добавленных треков:',
-          (count_likes_tracks_after-count_likes_tracks_before))
+          (count_likes_tracks_after - count_likes_tracks_before))
+    print('\nСписок не добавленых треков')
+    for track in not_add_tracks:
+        print(track)
+    time_stop_program = time.monotonic()
+    time_run_program = time_stop_program - time_start_program
+    print('Время работы программы:', time_run_program)
