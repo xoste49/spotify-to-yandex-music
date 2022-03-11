@@ -3,6 +3,7 @@
 """
 import os
 import time
+import urllib
 
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -62,31 +63,30 @@ def send_search_request_and_print_result(client, track, number, count_tracks):
                     return "✅ (%s/%s) %s | %s" % (
                     number, count_tracks, query, artists + best.title)
                 else:
-                    not_add_tracks.append("❌ %s | Произошла ошибка" % query)
+                    not_add_tracks.append(track['artist'] + ' - ' + track['name'])
                     return "❌ (%s/%s) %s | Произошла ошибка" % (
                     number, count_tracks, query)
-    not_add_tracks.append("❌ %s | Трек не найден" % query)
+    not_add_tracks.append(track['artist'] + ' - ' + track['name'])
     return "❌ (%s/%s) %s | Трек не найден" % (number, count_tracks, query)
 
 
 if __name__ == '__main__':
     time_start_program = time.monotonic()
     Client()
-    spotify_tracks = parse_spotify()
+    spotify_tracks = parse_spotify()[:60]
     spotify_tracks.reverse()
 
     client = Client(os.environ['YANDEX_MUSIC_TOKEN']).init()
     count_likes_tracks_before = len(client.users_likes_tracks().tracks)
     count_spotify_tracks = len(spotify_tracks)
     for number, track in enumerate(spotify_tracks):
-        print(send_search_request_and_print_result(client, track, number,
-                                             count_spotify_tracks))
+        print(send_search_request_and_print_result(client, track, number, count_spotify_tracks))
     count_likes_tracks_after = len(client.users_likes_tracks().tracks)
     print('Количество добавленных треков:',
           (count_likes_tracks_after - count_likes_tracks_before))
     print('\nСписок не добавленых треков')
     for track in not_add_tracks:
-        print(track)
+        print('❌ %s | https://music.yandex.ru/search?text=%s&type=tracks' % (track, urllib.parse.quote(track)))
     time_stop_program = time.monotonic()
     time_run_program = time_stop_program - time_start_program
     print('Время работы программы:', time_run_program)
