@@ -2,15 +2,12 @@
 Скрипт копирующий музыку из Spotify в Яндекс.Музыка
 """
 import os
-import time
 import urllib
-from pprint import pprint
 
 import spotipy
+from dotenv import load_dotenv
 from spotipy.oauth2 import SpotifyOAuth
 from yandex_music import Client
-
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -77,9 +74,12 @@ def main():
     spotify_tracks.reverse()
 
     client = Client(os.environ['YANDEX_MUSIC_TOKEN']).init()
-    count_likes_tracks_before = len(client.users_likes_tracks().tracks)
+    yandex_tracks = client.users_likes_tracks().tracks
+
     count_spotify_tracks = len(spotify_tracks)
     print('Всего треков в spotify', count_spotify_tracks, '\n')
+
+    count_likes_tracks_before = len(yandex_tracks)
     for number, track in enumerate(spotify_tracks):
         print(send_search_request_and_print_result(client, track, number,
                                                    count_spotify_tracks))
@@ -93,9 +93,4 @@ def main():
 
 
 if __name__ == '__main__':
-    time_start_program = time.monotonic()
     main()
-    time_stop_program = time.monotonic()
-    time_run_program = time_stop_program - time_start_program
-    print('Время работы программы:', time_run_program)
-
