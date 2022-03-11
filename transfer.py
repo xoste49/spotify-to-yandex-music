@@ -73,7 +73,7 @@ def send_search_request_and_print_result(client, track, number, count_tracks):
 if __name__ == '__main__':
     time_start_program = time.monotonic()
     Client()
-    spotify_tracks = parse_spotify()[:60]
+    spotify_tracks = parse_spotify()
     spotify_tracks.reverse()
 
     client = Client(os.environ['YANDEX_MUSIC_TOKEN']).init()
