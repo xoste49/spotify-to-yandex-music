@@ -39,6 +39,6 @@ python delete_all_from_yandexmusic.py
 ![screenshot](https://user-images.githubusercontent.com/7299412/158782647-a1392ad6-2854-40d6-acb9-2213012bef3a.png)
 
 ## Используемые библиотеки
-spotipy: https://github.com/plamere/spotipy
-yandex-music: https://github.com/MarshalX/yandex-music-api
-progress: https://github.com/verigak/progress/
+spotipy: https://github.com/plamere/spotipy  
+yandex-music: https://github.com/MarshalX/yandex-music-api  
+progress: https://github.com/verigak/progress/  
