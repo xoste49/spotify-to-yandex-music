@@ -2,7 +2,9 @@
 Скрипт копирующий музыку из Spotify в Яндекс.Музыка
 """
 import os
+import sys
 import urllib
+from pprint import pprint
 
 import spotipy
 from dotenv import load_dotenv
@@ -73,7 +75,7 @@ def send_search_request_and_print_result(client, track, number, count_tracks):
     return "❌ (%s/%s) %s | Трек не найден" % (number, count_tracks, query)
 
 
-def main():
+def main(track_start_from=0):
     spotify_tracks = parse_spotify()
     spotify_tracks.reverse()
 
@@ -85,16 +87,42 @@ def main():
 
     count_likes_tracks_before = len(yandex_tracks)
     for number, track in enumerate(spotify_tracks):
-        print(send_search_request_and_print_result(client, track, number,
-                                                   count_spotify_tracks))
+        if number >= track_start_from:
+            print(send_search_request_and_print_result(
+                client, track, number, count_spotify_tracks
+            ))
     count_likes_tracks_after = len(client.users_likes_tracks().tracks)
     print('Количество добавленных треков:',
           (count_likes_tracks_after - count_likes_tracks_before))
     print('\nСписок не добавленых треков:', len(not_add_tracks))
     for track in not_add_tracks:
-        print('❌ %s | https://music.yandex.ru/search?text=%s&type=tracks' % (
-        track, urllib.parse.quote(track)))
+        print('❌ %s | https://music.yandex.ru/search?text=%s&type=tracks' %
+              (track, urllib.parse.quote(track)))
 
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) == 1:
+        main(0)
+    else:
+        if len(sys.argv) < 3:
+            print("Ошибка. Слишком мало параметров.")
+            sys.exit(1)
+
+        if len(sys.argv) > 3:
+            print("Ошибка. Слишком много параметров.")
+            sys.exit(1)
+
+        param_name = sys.argv[1]
+        param_value = sys.argv[2]
+
+        if (param_name == "--from" or
+                param_name == "-f"):
+            try:
+                type(int(param_value))
+            except ValueError:
+                print(f'В {param_name} должно передаваться число!')
+                sys.exit(1)
+            main(int(param_value))
+        else:
+            print("Ошибка. Неизвестный параметр '{}'".format(param_name))
+            sys.exit(1)

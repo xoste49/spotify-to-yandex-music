@@ -27,6 +27,10 @@ nano .env # Environments
 pip install -r requirements.txt
 python transfer.py
 ```
+Параметры
+```bash
+-f, --from int    Начать добавлять с n-ного трека. Например --from 120. (Нужен на случай обрыва соединения)
+```
 
 ## Удаление всех треков из плейлиста "Мне нравится" на Яндекс.Музыка
 ```bash
