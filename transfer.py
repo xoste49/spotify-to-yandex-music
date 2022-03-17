@@ -65,6 +65,10 @@ def send_search_request_and_print_result(client, track, number, count_tracks):
                 if success:
                     return "✅ (%s/%s) %s | %s" % (
                         number, count_tracks, query, artists + best.title)
+                else:
+                    not_add_tracks.append(track['artist'] + ' - ' + track['name'])
+                    return "❌ (%s/%s) %s | Произошла ошибка" % (
+                    number, count_tracks, query)
     not_add_tracks.append(track['artist'] + ' - ' + track['name'])
     return "❌ (%s/%s) %s | Трек не найден" % (number, count_tracks, query)
 

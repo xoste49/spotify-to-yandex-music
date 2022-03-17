@@ -16,7 +16,6 @@ print('Всего треков на удаление:', len(client.users_likes_t
 with Bar('Удаление', max=len(client.users_likes_tracks().tracks)) as bar:
     for track in client.users_likes_tracks().tracks:
         success = client.users_likes_tracks_remove(track.id)
-        #answer = f'{track.id} Удален' if success else f'{track.id} Произошла ошибка'
         bar.next()
 
 print('Осталось треков:', len(client.users_likes_tracks().tracks))
