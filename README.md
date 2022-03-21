@@ -1,4 +1,6 @@
 # Spotify To Yandex.Music
+### Яндекс реализовал свой перенос музыки к себе https://music.yandex.ru/newimport
+### Репозиторий больше не актуален
 Из-за возможной блокировкой Spotify написал пару скриптов для копирования музыки из Spotify в Яндекс.Музыка
 
 [Способ получения токена Яндекс.Музыки.](https://github.com/xoste49/yandex-music-token)  
